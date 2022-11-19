@@ -1,0 +1,24 @@
+{
+	"twitch": {
+		"client_id": "xxx",
+		"client_secret": "xxx",
+		"access_token": "xxx",
+		"watchlist": [
+			"partymann2000hd",
+			"BastiGHG",
+			"bonjwa",
+		    "chrisfigge",
+		    "artimus83",
+		    "dennsen86",
+		    "achnina",
+		    "Trymacs",
+		    "VarsityGaming",
+		    "MontanaBlack88",
+		    "unsympathisch_tv",
+		    "Papaplatte",
+		    "TheRealOnit",
+		    "GronkhTV",
+		    "maxikingg88"
+		]
+	}
+}

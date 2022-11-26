@@ -120,7 +120,7 @@ class twitch(commands.Cog):
 
     @tasks.loop(seconds=90)
     async def check_twitch_online_streamers(self):
-        channel = self.bot.get_channel(995774013030813696)
+        channel = self.bot.get_channel(xxx)
         if not channel:
             return
 

@@ -42,9 +42,10 @@ import json
 import asyncio
 import datetime
 import requests
+import time
 
 from discord.ext import commands, tasks
-from datetime import datetime, date, time, timezone
+from datetime import datetime, date, time, timezone, timedelta
 
 with open("config.json") as config_file:
     config = json.load(config_file)
@@ -60,9 +61,12 @@ def get_app_access_token():
     access_token = response.json()["access_token"]
     return access_token
 
-#Aller 60 Tage Muss der Acces Token neu generiert werden
-#access_token = get_app_access_token()
-#print(access_token)
+# Berechne die UNIX Zeit für 60 Tage in der Zukunft in diesem format: <t:UNIXTIME:R
+def unix_time():
+    now = datetime.now()
+    future = now + timedelta(weeks=3)
+    unix_time = future.timestamp()
+    return int(unix_time)
 
 def get_users(login_names):
     params = {
@@ -117,10 +121,24 @@ class twitch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.check_twitch_online_streamers.start()
+        self.check_twitch_access_token.start()
+
+    @tasks.loop(seconds=60)
+    async def check_twitch_access_token(self):
+        print("Access token is checked")
+        time = datetime.now()
+        current_time = time.timestamp()
+        if int(current_time) >= config["twitch"]["expire_date"]:
+            access_token = get_app_access_token()
+            config["twitch"]["access_token"] = access_token
+            config["twitch"]["expire_date"] = unix_time()
+            print("The access token was regenerated")
+            with open("config.json", "w") as config_file:
+                json.dump(config, config_file, indent=4)
 
     @tasks.loop(seconds=90)
     async def check_twitch_online_streamers(self):
-        channel = self.bot.get_channel(xxx)
+        channel = self.bot.get_channel(config["twitch"]["channel_id"])
         if not channel:
             return
 
@@ -155,6 +173,8 @@ The next one is a part of a `config` and has to be added to your `config.json` o
 		"client_id": "xxx",
 		"client_secret": "xxx",
 		"access_token": "xxx",
+        	"channel_id": xxx,
+        	"expire_date": 1669483138,
 		"watchlist": [
 			"partymann2000hd",
 			"BastiGHG",
@@ -175,13 +195,6 @@ The next one is a part of a `config` and has to be added to your `config.json` o
 	}
 }
 ```
-
-### 3. The Access-Token
-To get this, go to the Cog code and go there to the lines `24` - `26`.
-There you remove the `#` at the beginning of line 25 and 26 and start the code once. Now you get in your console show the Access Token. You simply copy this to your `config.json`
-
-### 3.1
-When you have done this, go back into the code and put the `#` at the beginning of lines `25` and `26` 
 
 ## Contributing
 

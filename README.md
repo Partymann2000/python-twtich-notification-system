@@ -173,7 +173,7 @@ The next one is a part of a `config` and has to be added to your `config.json` o
 		"client_id": "xxx",
 		"client_secret": "xxx",
 		"access_token": "xxx",
-        	"channel_id": xxx,
+        	"channel_id": "xxx",
         	"expire_date": 1669483138,
 		"watchlist": [
 			"partymann2000hd",

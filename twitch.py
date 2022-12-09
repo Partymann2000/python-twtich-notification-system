@@ -3,9 +3,10 @@ import json
 import asyncio
 import datetime
 import requests
+import time
 
 from discord.ext import commands, tasks
-from datetime import datetime, date, time, timezone
+from datetime import datetime, date, time, timezone, timedelta
 
 with open("config.json") as config_file:
     config = json.load(config_file)
@@ -21,9 +22,12 @@ def get_app_access_token():
     access_token = response.json()["access_token"]
     return access_token
 
-#Every 60 days the access token must be generated again
-#access_token = get_app_access_token()
-#print(access_token)
+# Berechne die UNIX Zeit für 60 Tage in der Zukunft in diesem format: <t:UNIXTIME:R
+def unix_time():
+    now = datetime.now()
+    future = now + timedelta(weeks=3)
+    unix_time = future.timestamp()
+    return int(unix_time)
 
 def get_users(login_names):
     params = {
@@ -78,11 +82,24 @@ class twitch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.check_twitch_online_streamers.start()
+        self.check_twitch_access_token.start()
+
+    @tasks.loop(seconds=60)
+    async def check_twitch_access_token(self):
+        print("Access token is checked")
+        time = datetime.now()
+        current_time = time.timestamp()
+        if int(current_time) >= config["twitch"]["expire_date"]:
+            access_token = get_app_access_token()
+            config["twitch"]["access_token"] = access_token
+            config["twitch"]["expire_date"] = unix_time()
+            print("The access token was regenerated")
+            with open("config.json", "w") as config_file:
+                json.dump(config, config_file, indent=4)
 
     @tasks.loop(seconds=90)
     async def check_twitch_online_streamers(self):
-        # Put here our Channel ID, to send the Notification
-        channel = self.bot.get_channel(xxx)
+        channel = self.bot.get_channel(config["twitch"]["channel_id"])
         if not channel:
             return
 

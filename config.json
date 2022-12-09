@@ -3,6 +3,8 @@
 		"client_id": "xxx",
 		"client_secret": "xxx",
 		"access_token": "xxx",
+        	"channel_id": "xxx",
+        	"expire_date": 1649873640,
 		"watchlist": [
 			"partymann2000hd",
 			"BastiGHG",
